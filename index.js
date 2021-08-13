@@ -14,7 +14,7 @@ firebase.initializeApp({
 
 var db = firebase.database();
 
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || 3002;
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
@@ -39,6 +39,39 @@ app.get('/books',  function (req, res)  {
 });
 
 
+
+
+
+
+app.post('/plus',  function (req, res)  { 	
+	res.setHeader('Content-Type', 'application/json');
+
+	var num01 = req.body.num1;
+	var num02 = req.body.num2;
+
+	res.send('{"result": ' + (num01+num02)+'}');
+
+});
+
+
+app.get('/students',  function (req, res)  {  
+
+	res.setHeader('Content-Type', 'application/json');
+
+	var booksReference = db.ref("students");
+
+	//Attach an asynchronous callback to read the data
+	booksReference.on("value", 
+				function(snapshot) {					
+					res.json(snapshot.val());
+					booksReference.off("value");
+					}, 
+				function (errorObject) {
+					res.send("The read failed: " + errorObject.code);
+				});
+  
+});
+
 app.get('/topsellers',  function (req, res)  {  
 
 		res.setHeader('Content-Type', 'application/json');
@@ -61,8 +94,23 @@ app.get('/topsellers',  function (req, res)  {
 app.get('/book/:bookid',  function (req, res)  {  
   	
 		//Code Here
+		res.setHeader('Content-Type', 'application/json');
+		var bookid = Number (req.params.bookid);
 
+		var booksReference = db.ref("books");
+
+		//Attach an asynchronous callback to read the data
+		booksReference.orderByChild("bookid").equalTo(bookid).on("child_added" , 
+				function(snapshot) {					
+					res.json(snapshot.val());
+					booksReference.off("value");
+					}, 
+				function (errorObject) {
+					res.send("The read failed: " + errorObject.code);
+				});
+  
 });
+
 
 app.delete('/book/:bookid',  function (req, res)  {  
   	
