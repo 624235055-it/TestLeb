@@ -106,6 +106,38 @@ app.post('/book',  function (req, res)  {
 });
 
 
+app.post('/student', function (req, res) {
+	var students = Number(req.body.students);
+	var studentid = req.body.studentid;
+	var studentName = req.body.studentName;
+
+	var referencePath = '/students/' + students + '/';
+	var studentsReference = db.ref(referencePath);
+
+
+	if (studentsReference != null) {
+
+		studentsReference.update({ studentid:studentid, studentName:studentName },
+			function (error) {
+				if (error) {
+					res.send("Data could not be saved." + error)
+				}
+				else {
+					res.send("Success!!");
+				}
+
+			}
+
+		);
+	}
+
+});
+
+
+
+
+
+
 
 
 
@@ -213,6 +245,21 @@ app.delete('/book/:bookid',  function (req, res)  {
 	if (booksReference!=null){
 		booksReference.remove()
 		return res.send("Success!!")
+	}
+	if (error) throw error;
+
+});
+
+
+app.delete('/student/:students', function (req, res){
+	
+	var students = req.params.students;
+
+	var referencePath = '/students/' + students + '/';
+	var studentsReference = db.ref(referencePath);
+	if (studentsReference != null){
+		studentsReference.remove()
+		res.send("Succrss!!")
 	}
 	if (error) throw error;
 
